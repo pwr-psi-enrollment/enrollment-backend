@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/student-registrations")
-public class StudentRegistrationController {
+class StudentRegistrationController {
 
 	private StudentRegistrationService studentRegistrationService;
 

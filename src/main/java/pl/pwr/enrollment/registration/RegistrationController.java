@@ -11,7 +11,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/registrations")
-public class RegistrationController {
+class RegistrationController {
 
 	private final RegistrationService registrationService;
 

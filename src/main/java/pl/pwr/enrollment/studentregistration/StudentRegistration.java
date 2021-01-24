@@ -68,6 +68,14 @@ public class StudentRegistration {
 		return registeredId;
 	}
 
+	public Set<Long> getLectureGroupIds() {
+		return lectureGroupIds;
+	}
+
+	public void enroll(Long lectureGroupId) {
+		lectureGroupIds.add(lectureGroupId);
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

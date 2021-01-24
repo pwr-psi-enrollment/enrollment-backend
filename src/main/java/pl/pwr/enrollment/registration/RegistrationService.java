@@ -4,6 +4,10 @@ import org.springframework.stereotype.Service;
 import pl.pwr.enrollment.registration.dto.RegistrationCreationDto;
 import pl.pwr.enrollment.registration.dto.RegistrationDetailsDto;
 
+import java.util.List;
+
+import static java.util.stream.Collectors.toList;
+
 @Service
 public class RegistrationService {
 
@@ -19,4 +23,13 @@ public class RegistrationService {
 		return RegistrationDetailsDto.from(registration);
 	}
 
+	public void deleteRegistration(Long registrationId) {
+		registrationRepository.deleteById(registrationId);
+	}
+
+	public List<RegistrationDetailsDto> findStudentRegistrations(Long studentId, Long semesterId, Long programmeId) {
+		return registrationRepository.findAllByProgrammeIdAndSemesterId(programmeId, semesterId).stream()
+				.map(RegistrationDetailsDto::from)
+				.collect(toList());
+	}
 }

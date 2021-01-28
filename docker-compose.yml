@@ -1,0 +1,31 @@
+version: '3.3'
+services:
+
+
+  database:
+    image: database
+    build:
+      context: .
+      dockerfile: database.Dockerfile
+      args:
+        - MYSQL_ROOT_PASSWORD=root-password
+        - MYSQL_USER=psi_enrollments-user
+        - MYSQL_PASSWORD=psi_enrollments-password
+        - MYSQL_DATABASE=psi_enrollments
+    container_name: database
+    ports:
+      - 3306:3306
+
+  backend:
+    image: backend
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    container_name: backend
+    ports:
+      - 8080:8080
+    links:
+      - database
+    depends_on:
+      - database
+    command: ["assets/wait-for-it.sh", "-t", "60", "database:3306", "--", "java", "-jar", "target/enrollment-backend-0.0.1-SNAPSHOT.jar"]

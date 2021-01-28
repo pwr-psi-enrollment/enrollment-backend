@@ -4,7 +4,7 @@ pipeline {
     kubernetes {
       label 'enrollment-backend'
       idleMinutes 5
-      yamlFile '.jenkins-config/python38-pod.yaml'
+      yamlFile '.jenkins-config/maven36-pod.yaml'
       defaultContainer 'maven36'
     }
   }

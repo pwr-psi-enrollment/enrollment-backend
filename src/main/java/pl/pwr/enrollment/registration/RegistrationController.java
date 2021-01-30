@@ -3,7 +3,6 @@ package pl.pwr.enrollment.registration;
 import org.springframework.web.bind.annotation.*;
 import pl.pwr.enrollment.registration.dto.RegistrationCreationDto;
 import pl.pwr.enrollment.registration.dto.RegistrationDetailsDto;
-import pl.pwr.enrollment.studentregistration.StudentRegistrationService;
 
 import javax.validation.Valid;
 import java.util.List;

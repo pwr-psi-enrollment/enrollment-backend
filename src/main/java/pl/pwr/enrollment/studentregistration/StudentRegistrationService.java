@@ -5,11 +5,12 @@ import pl.pwr.enrollment.studentregistration.dto.LectureGroupIdDto;
 
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 public class StudentRegistrationService {
 
-	private StudentRegistrationRepository studentRegistrationRepository;
+	private final StudentRegistrationRepository studentRegistrationRepository;
 
 	public StudentRegistrationService(StudentRegistrationRepository studentRegistrationRepository) {
 		this.studentRegistrationRepository = studentRegistrationRepository;
@@ -22,5 +23,9 @@ public class StudentRegistrationService {
 				.orElseThrow(EntityNotFoundException::new);
 
 		studentRegistration.enroll(lectureGroupIdDto.lectureGroupId);
+	}
+
+	public List<StudentRegistration> findRegistrationsForSemester(Long registeredId, Long semesterId) {
+		return studentRegistrationRepository.findRegistrationsForSemester(registeredId, semesterId);
 	}
 }

@@ -12,6 +12,7 @@ public class CourseDto {
 	private final String type;
 	private final Integer ects;
 	private final List<GroupDto> groups;
+	private Boolean enrolled = false;
 
 	@JsonCreator
 	public CourseDto(
@@ -45,5 +46,13 @@ public class CourseDto {
 
 	public List<GroupDto> getGroups() {
 		return groups;
+	}
+
+	public Boolean getEnrolled() {
+		return enrolled;
+	}
+
+	public void setEnrolled(Boolean enrolled) {
+		this.enrolled = enrolled;
 	}
 }

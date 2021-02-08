@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.List;
 
-public class SemesterDto {
+public class SemesterData {
 
 	private final Long id;
 	private final String academicYear;
@@ -15,7 +15,7 @@ public class SemesterDto {
 	private final List<CourseDto> courses;
 
 	@JsonCreator
-	public SemesterDto(
+	public SemesterData(
 			@JsonProperty("id") Long id,
 			@JsonProperty("academicYear") String academicYear,
 			@JsonProperty("semesterType") String semesterType,

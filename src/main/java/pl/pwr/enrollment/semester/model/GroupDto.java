@@ -13,6 +13,7 @@ public class GroupDto {
 	private final String room;
 	private final Integer takenSeats;
 	private final Integer allSeats;
+	private Boolean enrolled;
 
 	public GroupDto(
 			@JsonProperty("id") Long id,
@@ -69,5 +70,13 @@ public class GroupDto {
 
 	public Integer getAllSeats() {
 		return allSeats;
+	}
+
+	public Boolean getEnrolled() {
+		return enrolled;
+	}
+
+	public void setEnrolled(Boolean enrolled) {
+		this.enrolled = enrolled;
 	}
 }

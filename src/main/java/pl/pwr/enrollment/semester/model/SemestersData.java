@@ -8,12 +8,12 @@ import java.util.List;
 public class SemestersData {
 
 	private final Long registeredId;
-	private final List<SemesterDto> semesters;
+	private final List<SemesterData> semesters;
 
 	@JsonCreator
 	public SemestersData(
 			@JsonProperty("registeredId") Long registeredId,
-			@JsonProperty("semesters") List<SemesterDto> semesters) {
+			@JsonProperty("semesters") List<SemesterData> semesters) {
 		this.registeredId = registeredId;
 		this.semesters = semesters;
 	}
@@ -22,7 +22,7 @@ public class SemestersData {
 		return registeredId;
 	}
 
-	public List<SemesterDto> getSemesters() {
+	public List<SemesterData> getSemesters() {
 		return semesters;
 	}
 

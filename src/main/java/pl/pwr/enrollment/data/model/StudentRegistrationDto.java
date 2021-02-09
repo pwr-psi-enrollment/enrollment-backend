@@ -1,4 +1,4 @@
-package pl.pwr.enrollment.web.model;
+package pl.pwr.enrollment.data.model;
 
 import pl.pwr.enrollment.registration.RegistrationDestination;
 import pl.pwr.enrollment.registration.RegistrationKind;

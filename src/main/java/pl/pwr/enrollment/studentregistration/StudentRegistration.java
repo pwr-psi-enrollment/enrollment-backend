@@ -48,6 +48,10 @@ public class StudentRegistration {
 		this.registeredId = registeredId;
 	}
 
+	public void enrollToGroup(Long groupId) {
+		lectureGroupIds.add(groupId);
+	}
+
 	public Long getId() {
 		return id;
 	}

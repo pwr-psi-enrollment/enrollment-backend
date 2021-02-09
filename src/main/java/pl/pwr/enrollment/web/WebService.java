@@ -2,21 +2,14 @@ package pl.pwr.enrollment.web;
 
 import org.springframework.stereotype.Service;
 import pl.pwr.enrollment.data.ExternalDataService;
-import pl.pwr.enrollment.data.model.CoursesData;
-import pl.pwr.enrollment.data.model.StudentDetailsData;
-import pl.pwr.enrollment.semester.SemesterDetailsDto;
-import pl.pwr.enrollment.semester.model.CourseDto;
-import pl.pwr.enrollment.semester.model.GroupDto;
-import pl.pwr.enrollment.semester.model.SemesterData;
-import pl.pwr.enrollment.semester.model.SemestersData;
+import pl.pwr.enrollment.data.model.*;
 import pl.pwr.enrollment.studentregistration.StudentRegistration;
 import pl.pwr.enrollment.studentregistration.StudentRegistrationService;
-import pl.pwr.enrollment.web.model.FieldOfStudyDto;
-import pl.pwr.enrollment.web.model.StudentDetailsDto;
 
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
+import java.util.function.ToIntFunction;
 
 import static java.util.stream.Collectors.toList;
 
@@ -34,23 +27,7 @@ public class WebService {
 	public StudentDetailsDto getStudentDetails(String authorization) {
 		StudentDetailsData studentDetailsData = externalDataService.queryStudentDetails(authorization);
 
-		return new StudentDetailsDto(
-				studentDetailsData.getId(),
-				studentDetailsData.getName(),
-				studentDetailsData.getSurname(),
-				studentDetailsData.getIndexNumber(),
-				studentDetailsData.getFieldsOfStudy().stream()
-						.map(field -> new FieldOfStudyDto(
-								field.getId(),
-								field.getFaculty(),
-								field.getName(),
-								field.getStudyDegree(),
-								field.getSpecialization(),
-								field.getRegisteredId(),
-								querySemesters(field.getRegisteredId())
-						))
-						.collect(toList())
-		);
+		return mapToStudentDetailsDto(studentDetailsData);
 	}
 
 	@Transactional
@@ -61,50 +38,105 @@ public class WebService {
 		CoursesData coursesData = externalDataService.queryCourses(registrationId);
 		Set<Long> lectureGroupIds = studentRegistration.getLectureGroupIds();
 
-		coursesData.getCourses().forEach(course -> {
-					course.getGroups().forEach(group ->
-							group.setEnrolled(
-									lectureGroupIds.contains(group.getId())
-							)
-					);
-
-					course.setEnrolled(
-							course.getGroups().stream().anyMatch(GroupDto::getEnrolled)
-					);
-				}
-		);
+		coursesData.getCourses().forEach(course -> markEnrolledCoursesAndGroups(lectureGroupIds, course));
 
 		return coursesData;
+	}
+
+	@Transactional
+	public void enrollToGroup(Long studentRegistrationId, EnrollmentDto enrollmentDto) {
+		StudentRegistration studentRegistration = studentRegistrationService.findById(studentRegistrationId);
+		studentRegistration.enrollToGroup(enrollmentDto.getGroupId());
+	}
+
+	public List<StudentRegistrationDto> getStudentRegistrations(Long registeredId, Long semesterId) {
+		List<StudentRegistration> studentRegistrations = studentRegistrationService.findRegistrationsForSemester(registeredId, semesterId);
+		return studentRegistrations.stream()
+				.map(this::getStudentRegistrationDto)
+				.collect(toList());
+	}
+
+	private StudentDetailsDto mapToStudentDetailsDto(StudentDetailsData studentDetailsData) {
+		return new StudentDetailsDto(
+				studentDetailsData.getId(),
+				studentDetailsData.getName(),
+				studentDetailsData.getSurname(),
+				studentDetailsData.getIndexNumber(),
+				studentDetailsData.getFieldsOfStudy().stream()
+						.map(this::getFieldOfStudyDto)
+						.collect(toList())
+		);
+	}
+
+	private FieldOfStudyDto getFieldOfStudyDto(FieldOfStudyData field) {
+		List<SemesterDetailsDto> semesters = querySemesters(field.getRegisteredId());
+		return new FieldOfStudyDto(
+				field.getId(),
+				field.getFaculty(),
+				field.getName(),
+				field.getStudyDegree(),
+				field.getSpecialization(),
+				field.getRegisteredId(),
+				semesters.size() > 0 ? semesters.get(0).getYear() : null,
+				semesters
+		);
 	}
 
 	private List<SemesterDetailsDto> querySemesters(Long registeredId) {
 		SemestersData semestersData = externalDataService.querySemesters(registeredId);
 		return semestersData.getSemesters().stream()
-				.map(semester ->
-						new SemesterDetailsDto(
-								semester.getId(),
-								semester.getAcademicYear(),
-								semester.getSemesterType(),
-								semester.getYear(),
-								semester.getSemesterNumber(),
-								calculateEcts(registeredId, semester),
-								0 // TODO: ZZU
-						)
-				)
+				.map(semester -> mapToSemesterDetailsDto(registeredId, semester))
 				.collect(toList());
 	}
 
-	private Integer calculateEcts(Long registeredId, SemesterData semester) {
+	private SemesterDetailsDto mapToSemesterDetailsDto(Long registeredId, SemesterData semester) {
 		List<StudentRegistration> registrations = studentRegistrationService.findRegistrationsForSemester(registeredId, semester.getId());
+		return new SemesterDetailsDto(
+				semester.getId(),
+				semester.getAcademicYear(),
+				semester.getSemesterType(),
+				semester.getYear(),
+				semester.getSemesterNumber(),
+				calculateCourseData(semester, registrations, CourseDto::getEcts),
+				calculateCourseData(semester, registrations, CourseDto::getZzu)
+		);
+	}
+
+	private Integer calculateCourseData(SemesterData semester, List<StudentRegistration> registrations, ToIntFunction<CourseDto> calculationFunction) {
 		return registrations.stream()
 				.flatMap(reg -> reg.getLectureGroupIds().stream())
 				.mapToInt(lectureGroupId ->
 						semester.getCourses().stream()
 								.filter(course -> course.getGroups().stream().anyMatch(g -> g.getId().equals(lectureGroupId)))
-								.mapToInt(CourseDto::getEcts)
+								.mapToInt(calculationFunction)
 								.findAny()
 								.orElse(0)
 				)
 				.sum();
+	}
+
+	private void markEnrolledCoursesAndGroups(Set<Long> lectureGroupIds, CourseDto course) {
+		course.getGroups().forEach(group ->
+				group.setEnrolled(
+						lectureGroupIds.contains(group.getId())
+				)
+		);
+
+		course.setEnrolled(
+				course.getGroups().stream().anyMatch(GroupDto::getEnrolled)
+		);
+	}
+
+	private StudentRegistrationDto getStudentRegistrationDto(StudentRegistration reg) {
+		return new StudentRegistrationDto(
+				reg.getId(),
+				reg.getRegistration().getName(),
+				reg.getRegistration().getDestination(),
+				reg.getRegistration().getKind(),
+				reg.getRegistration().getStatus(),
+				reg.getRegistration().getStartTime(),
+				reg.getRegistration().getEndTime(),
+				reg.getStartTime()
+		);
 	}
 }

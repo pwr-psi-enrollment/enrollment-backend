@@ -1,4 +1,4 @@
-package pl.pwr.enrollment.web.model;
+package pl.pwr.enrollment.data.model;
 
 import java.util.List;
 

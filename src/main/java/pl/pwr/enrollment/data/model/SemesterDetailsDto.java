@@ -1,4 +1,4 @@
-package pl.pwr.enrollment.semester;
+package pl.pwr.enrollment.data.model;
 
 public class SemesterDetailsDto {
 

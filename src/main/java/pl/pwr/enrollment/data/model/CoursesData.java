@@ -2,7 +2,6 @@ package pl.pwr.enrollment.data.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import pl.pwr.enrollment.semester.model.CourseDto;
 
 import java.util.List;
 

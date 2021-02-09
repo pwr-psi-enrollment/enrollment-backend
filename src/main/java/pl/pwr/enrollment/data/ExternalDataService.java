@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import pl.pwr.enrollment.data.model.CoursesData;
 import pl.pwr.enrollment.data.model.StudentDetailsData;
-import pl.pwr.enrollment.semester.model.SemestersData;
+import pl.pwr.enrollment.data.model.SemestersData;
 
 @Service
 public class ExternalDataService {

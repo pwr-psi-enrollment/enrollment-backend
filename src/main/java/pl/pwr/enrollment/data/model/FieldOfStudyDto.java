@@ -1,7 +1,4 @@
-package pl.pwr.enrollment.web.model;
-
-import pl.pwr.enrollment.data.model.FacultyData;
-import pl.pwr.enrollment.semester.SemesterDetailsDto;
+package pl.pwr.enrollment.data.model;
 
 import java.util.List;
 
@@ -13,15 +10,25 @@ public class FieldOfStudyDto {
 	private final String studyDegree;
 	private final String specialization;
 	private final Long registeredId;
+	private final Integer startYear;
 	private final List<SemesterDetailsDto> semesters;
 
-	public FieldOfStudyDto(Long id, FacultyData faculty, String name, String studyDegree, String specialization, Long registeredId, List<SemesterDetailsDto> semesters) {
+	public FieldOfStudyDto(
+			Long id,
+			FacultyData faculty,
+			String name,
+			String studyDegree,
+			String specialization,
+			Long registeredId,
+			Integer startYear,
+			List<SemesterDetailsDto> semesters) {
 		this.id = id;
 		this.faculty = faculty;
 		this.name = name;
 		this.studyDegree = studyDegree;
 		this.specialization = specialization;
 		this.registeredId = registeredId;
+		this.startYear = startYear;
 		this.semesters = semesters;
 	}
 
@@ -51,5 +58,9 @@ public class FieldOfStudyDto {
 
 	public List<SemesterDetailsDto> getSemesters() {
 		return semesters;
+	}
+
+	public Integer getStartYear() {
+		return startYear;
 	}
 }

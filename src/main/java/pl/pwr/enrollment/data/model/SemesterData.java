@@ -1,4 +1,4 @@
-package pl.pwr.enrollment.semester.model;
+package pl.pwr.enrollment.data.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;

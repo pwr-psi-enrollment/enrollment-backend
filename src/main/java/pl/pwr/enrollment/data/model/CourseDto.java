@@ -1,4 +1,4 @@
-package pl.pwr.enrollment.semester.model;
+package pl.pwr.enrollment.data.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,6 +11,7 @@ public class CourseDto {
 	private final String name;
 	private final String type;
 	private final Integer ects;
+	private final Integer zzu;
 	private final List<GroupDto> groups;
 	private Boolean enrolled = false;
 
@@ -20,11 +21,13 @@ public class CourseDto {
 			@JsonProperty("name") String name,
 			@JsonProperty("type") String type,
 			@JsonProperty("ects") Integer ects,
+			@JsonProperty("zzu") Integer zzu,
 			@JsonProperty("groups") List<GroupDto> groups) {
 		this.id = id;
 		this.name = name;
 		this.type = type;
 		this.ects = ects;
+		this.zzu = zzu;
 		this.groups = groups;
 	}
 
@@ -42,6 +45,10 @@ public class CourseDto {
 
 	public Integer getEcts() {
 		return ects;
+	}
+
+	public Integer getZzu() {
+		return zzu;
 	}
 
 	public List<GroupDto> getGroups() {

@@ -2,10 +2,7 @@ package pl.pwr.enrollment.web;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
-import pl.pwr.enrollment.data.model.CoursesData;
-import pl.pwr.enrollment.data.model.EnrollmentDto;
-import pl.pwr.enrollment.data.model.StudentDetailsDto;
-import pl.pwr.enrollment.data.model.StudentRegistrationDto;
+import pl.pwr.enrollment.data.model.*;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -37,10 +34,17 @@ public class WebController {
 	}
 
 	@PostMapping("/student-registrations/{studentRegistrationId}/enroll")
-	public void enrollToGroup(
+	public TakenSeatsResponse enrollToGroup(
 			@PathVariable("studentRegistrationId") Long studentRegistrationId,
 			@RequestBody @Valid EnrollmentDto enrollmentDto) {
-		webService.enrollToGroup(studentRegistrationId, enrollmentDto);
+		return webService.enrollToGroup(studentRegistrationId, enrollmentDto);
+	}
+
+	@DeleteMapping("/student-registrations/{studentRegistrationId}/enrollment/{lectureGroupId}")
+	public TakenSeatsResponse removeLectureEnrollment(
+			@PathVariable("studentRegistrationId") Long studentRegistrationId,
+			@PathVariable("lectureGroupId") Long lectureGroupId) {
+		return webService.removeEnrollment(studentRegistrationId, lectureGroupId);
 	}
 
 }

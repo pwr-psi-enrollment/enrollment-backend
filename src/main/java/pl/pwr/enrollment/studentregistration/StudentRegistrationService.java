@@ -22,4 +22,8 @@ public class StudentRegistrationService {
 		return studentRegistrationRepository.findById(studentRegistrationId)
 				.orElseThrow(EntityNotFoundException::new);
 	}
+
+	public Integer countTakenSeats(Long lectureGroupId) {
+		return studentRegistrationRepository.calculateTakenSeats(lectureGroupId);
+	}
 }

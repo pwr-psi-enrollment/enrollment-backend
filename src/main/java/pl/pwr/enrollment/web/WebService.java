@@ -39,14 +39,22 @@ public class WebService {
 		Set<Long> lectureGroupIds = studentRegistration.getLectureGroupIds();
 
 		coursesData.getCourses().forEach(course -> markEnrolledCoursesAndGroups(lectureGroupIds, course));
+		coursesData.getCourses().stream()
+				.flatMap(course -> course.getGroups().stream())
+				.forEach(this::calculateTakenSeats);
 
 		return coursesData;
 	}
 
 	@Transactional
-	public void enrollToGroup(Long studentRegistrationId, EnrollmentDto enrollmentDto) {
+	public TakenSeatsResponse enrollToGroup(Long studentRegistrationId, EnrollmentDto enrollmentDto) {
+		Long lectureGroup = enrollmentDto.getGroupId();
 		StudentRegistration studentRegistration = studentRegistrationService.findById(studentRegistrationId);
-		studentRegistration.enrollToGroup(enrollmentDto.getGroupId());
+		studentRegistration.enrollToGroup(lectureGroup);
+
+		return new TakenSeatsResponse(
+				studentRegistrationService.countTakenSeats(lectureGroup)
+		);
 	}
 
 	public List<StudentRegistrationDto> getStudentRegistrations(Long registeredId, Long semesterId) {
@@ -54,6 +62,16 @@ public class WebService {
 		return studentRegistrations.stream()
 				.map(this::getStudentRegistrationDto)
 				.collect(toList());
+	}
+
+	@Transactional
+	public TakenSeatsResponse removeEnrollment(Long studentRegistrationId, Long lectureGroupId) {
+		StudentRegistration studentRegistration = studentRegistrationService.findById(studentRegistrationId);
+		studentRegistration.getLectureGroupIds().remove(lectureGroupId);
+
+		return new TakenSeatsResponse(
+				studentRegistrationService.countTakenSeats(lectureGroupId)
+		);
 	}
 
 	private StudentDetailsDto mapToStudentDetailsDto(StudentDetailsData studentDetailsData) {
@@ -103,10 +121,15 @@ public class WebService {
 	}
 
 	private Integer calculateCourseData(SemesterData semester, List<StudentRegistration> registrations, ToIntFunction<CourseDto> calculationFunction) {
+		List<CourseDto> courses = registrations.stream()
+				.map(reg -> externalDataService.queryCourses(reg.getId()))
+				.flatMap(coursesData -> coursesData.getCourses().stream())
+				.collect(toList());
+
 		return registrations.stream()
 				.flatMap(reg -> reg.getLectureGroupIds().stream())
 				.mapToInt(lectureGroupId ->
-						semester.getCourses().stream()
+						courses.stream()
 								.filter(course -> course.getGroups().stream().anyMatch(g -> g.getId().equals(lectureGroupId)))
 								.mapToInt(calculationFunction)
 								.findAny()
@@ -138,5 +161,10 @@ public class WebService {
 				reg.getRegistration().getEndTime(),
 				reg.getStartTime()
 		);
+	}
+
+	private void calculateTakenSeats(GroupDto group) {
+		Integer takenSeats = studentRegistrationService.countTakenSeats(group.getId());
+		group.setTakenSeats(takenSeats);
 	}
 }

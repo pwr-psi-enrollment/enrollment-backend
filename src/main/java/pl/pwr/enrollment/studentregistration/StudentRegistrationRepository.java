@@ -11,4 +11,6 @@ interface StudentRegistrationRepository extends JpaRepository<StudentRegistratio
 	@Query("SELECT sr FROM StudentRegistration sr WHERE sr.registeredId = :registeredId AND sr.registration.semesterId = :semesterId")
 	List<StudentRegistration> findRegistrationsForSemester(@Param("registeredId") Long registeredId, @Param("semesterId") Long semesterId);
 
+	@Query("SELECT COUNT(sr) FROM StudentRegistration sr WHERE :lectureGroupId MEMBER OF sr.lectureGroupIds")
+	Integer calculateTakenSeats(@Param("lectureGroupId") Long lectureGroupId);
 }

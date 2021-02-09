@@ -11,8 +11,8 @@ public class GroupDto {
 	private final String start;
 	private final String end;
 	private final String room;
-	private final Integer takenSeats;
 	private final Integer allSeats;
+	private Integer takenSeats = 0;
 	private Boolean enrolled;
 
 	public GroupDto(
@@ -23,7 +23,6 @@ public class GroupDto {
 			@JsonProperty("start") String start,
 			@JsonProperty("end") String end,
 			@JsonProperty("room") String room,
-			@JsonProperty("takenSeats") Integer takenSeats,
 			@JsonProperty("allSeats") Integer allSeats) {
 		this.id = id;
 		this.code = code;
@@ -32,7 +31,6 @@ public class GroupDto {
 		this.start = start;
 		this.end = end;
 		this.room = room;
-		this.takenSeats = takenSeats;
 		this.allSeats = allSeats;
 	}
 
@@ -78,5 +76,9 @@ public class GroupDto {
 
 	public void setEnrolled(Boolean enrolled) {
 		this.enrolled = enrolled;
+	}
+
+	public void setTakenSeats(Integer takenSeats) {
+		this.takenSeats = takenSeats;
 	}
 }

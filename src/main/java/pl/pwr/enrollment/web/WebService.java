@@ -122,7 +122,9 @@ public class WebService {
 
 	private Integer calculateCourseData(SemesterData semester, List<StudentRegistration> registrations, ToIntFunction<CourseDto> calculationFunction) {
 		List<CourseDto> courses = registrations.stream()
-				.map(reg -> externalDataService.queryCourses(reg.getId()))
+				.map(reg -> reg.getRegistration().getId())
+				.distinct()
+				.map(externalDataService::queryCourses)
 				.flatMap(coursesData -> coursesData.getCourses().stream())
 				.collect(toList());
 
